@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from deployment_generator import DeploymentGenerator
+from diagram_generator import DiagramGenerator
 
 # Feature-to-Provider Mapping
 FEATURE_PROVIDER_MAPPING = {
@@ -74,15 +75,20 @@ class DeploymentPredictor:
 
     def analyze_and_generate(self, repo_name, project_structure):
         """
-        Analyze project structure and generate deployment files along with cloud service mappings.
+        Analyze project structure, generate deployment files, and create architecture diagrams.
         """
         generator = DeploymentGenerator()
+        diagram_generator = DiagramGenerator()
+
         service_mapping = generator.analyze_project_services(repo_name, project_structure)
-        return service_mapping
+        architecture_diagram = diagram_generator.generate_architecture_diagram(repo_name, project_structure)
+        
+        return service_mapping, architecture_diagram
 
 if __name__ == "__main__":
     predictor = DeploymentPredictor("dataset.csv")
     generator = DeploymentGenerator()
+    diagram_generator = DiagramGenerator()
     
     sample_repo = "excalidraw/excalidraw"
     predicted_deployment, justification = predictor.predict_deployment(sample_repo, n_similar=5)
@@ -90,8 +96,9 @@ if __name__ == "__main__":
     print(f"Justification: {justification}")
     
     project_structure = "server/api.py\n database/models.py\n authentication/login.py"
-    service_mapping = predictor.analyze_and_generate(sample_repo, project_structure)
+    service_mapping, architecture_diagram = predictor.analyze_and_generate(sample_repo, project_structure)
     print(f"\nRecommended Cloud Services for {sample_repo}:\n{service_mapping}")
+    print(f"\nGenerated Architecture Diagram:\n{architecture_diagram}")
     
     generated_files = generator.generate_files(predicted_deployment, sample_repo, project_structure)
     print("\nGenerated Deployment Files:")

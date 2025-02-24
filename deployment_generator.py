@@ -1,6 +1,7 @@
 import openai
 import os
 from dotenv import load_dotenv
+from diagram_generator import DiagramGenerator
 
 class DeploymentGenerator:
     def __init__(self):
@@ -16,6 +17,7 @@ class DeploymentGenerator:
             raise ValueError("OPENAI_API_KEY not found in environment variables. Please check your .env file.")
 
         self.client = openai.OpenAI(api_key=api_key)
+        self.diagram_generator = DiagramGenerator()
 
         # Default configuration
         self.model = "gpt-3.5-turbo"
@@ -70,7 +72,7 @@ class DeploymentGenerator:
 
     def generate_files(self, deployment_type: str, repo_name: str, project_structure: str) -> dict:
         """
-        Generate deployment configuration files and analyze cloud service requirements.
+        Generate deployment configuration files, analyze cloud service requirements, and create architecture diagrams.
 
         Args:
             deployment_type (str): The predicted deployment platform (e.g., AWS, Vercel, Firebase).
@@ -78,7 +80,7 @@ class DeploymentGenerator:
             project_structure (str): A textual representation of the project structure.
 
         Returns:
-            dict: A dictionary with file names as keys and file contents as values, including service mapping.
+            dict: A dictionary with file names as keys and file contents as values, including service mapping and architecture diagram.
         """
         # Define structured prompts based on deployment type
         prompts = {
@@ -94,6 +96,9 @@ class DeploymentGenerator:
         try:
             # First, analyze the project services
             service_mapping = self.analyze_project_services(repo_name, project_structure)
+            
+            # Generate architecture diagram
+            architecture_diagram = self.diagram_generator.generate_architecture_diagram(repo_name, project_structure)
 
             # Generate deployment configurations
             response = self.client.chat.completions.create(
@@ -115,8 +120,9 @@ class DeploymentGenerator:
                 "Google Cloud": {"deployment.yaml": generated_text},
             }
 
-            # Include service mapping in the final output
+            # Include service mapping and architecture diagram in the final output
             file_mappings["service_mapping.json"] = service_mapping
+            file_mappings["architecture_diagram.mmd"] = architecture_diagram
             return file_mappings
         
         except Exception as e:
