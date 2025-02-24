@@ -22,16 +22,63 @@ class DeploymentGenerator:
         self.temperature = 0.7
         self.response_format = "text"
 
-    def generate_files(self, deployment_type: str, repo_name: str) -> dict:
+    def analyze_project_services(self, repo_name: str, project_structure: str) -> dict:
         """
-        Generate deployment configuration files using ChatGPT.
+        Analyze the project structure and determine which cloud services
+        should be used for each functionality.
+
+        Args:
+            repo_name (str): The name of the repository.
+            project_structure (str): A textual representation of the project structure.
+
+        Returns:
+            dict: A dictionary mapping files to cloud services.
+        """
+        prompt = (
+            f"""Analyze the following project structure for {repo_name} and determine which cloud provider services 
+            (AWS, GCP, Firebase, Vercel, etc.) should be used for each file based on its functionality.
+            
+            Provide the response in JSON format with file paths as keys and the recommended cloud services as values.
+            
+            Example:
+            {{
+                "database/models.py": "AWS RDS",
+                "authentication/login.py": "Firebase Auth",
+                "server/api.py": "Google Cloud Functions"
+            }}
+            
+            Project Structure:
+            {project_structure}
+            """
+        )
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a cloud infrastructure expert. Map project files to cloud services."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=self.temperature,
+                response_format={"type": "json_object"}
+            )
+
+            return response.choices[0].message.content
+        
+        except Exception as e:
+            return {"error": f"An error occurred during service analysis: {str(e)}"}
+
+    def generate_files(self, deployment_type: str, repo_name: str, project_structure: str) -> dict:
+        """
+        Generate deployment configuration files and analyze cloud service requirements.
 
         Args:
             deployment_type (str): The predicted deployment platform (e.g., AWS, Vercel, Firebase).
             repo_name (str): The name of the repository.
+            project_structure (str): A textual representation of the project structure.
 
         Returns:
-            dict: A dictionary with file names as keys and file contents as values.
+            dict: A dictionary with file names as keys and file contents as values, including service mapping.
         """
         # Define structured prompts based on deployment type
         prompts = {
@@ -45,6 +92,10 @@ class DeploymentGenerator:
             return {"error.txt": f"No template available for {deployment_type}"}
 
         try:
+            # First, analyze the project services
+            service_mapping = self.analyze_project_services(repo_name, project_structure)
+
+            # Generate deployment configurations
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -64,7 +115,9 @@ class DeploymentGenerator:
                 "Google Cloud": {"deployment.yaml": generated_text},
             }
 
-            return file_mappings.get(deployment_type, {"error.txt": "File generation failed."})
-
+            # Include service mapping in the final output
+            file_mappings["service_mapping.json"] = service_mapping
+            return file_mappings
+        
         except Exception as e:
             return {"error.txt": f"An error occurred during file generation: {str(e)}"}
