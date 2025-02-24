@@ -80,7 +80,6 @@ class DeploymentPredictor:
         service_mapping = generator.analyze_project_services(repo_name, project_structure)
         return service_mapping
 
-
 if __name__ == "__main__":
     predictor = DeploymentPredictor("dataset.csv")
     generator = DeploymentGenerator()
@@ -93,3 +92,8 @@ if __name__ == "__main__":
     project_structure = "server/api.py\n database/models.py\n authentication/login.py"
     service_mapping = predictor.analyze_and_generate(sample_repo, project_structure)
     print(f"\nRecommended Cloud Services for {sample_repo}:\n{service_mapping}")
+    
+    generated_files = generator.generate_files(predicted_deployment, sample_repo, project_structure)
+    print("\nGenerated Deployment Files:")
+    for file_name, file_content in generated_files.items():
+        print(f"\n{file_name}:\n{file_content}\n")

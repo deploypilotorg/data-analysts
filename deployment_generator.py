@@ -18,7 +18,7 @@ class DeploymentGenerator:
         self.client = openai.OpenAI(api_key=api_key)
 
         # Default configuration
-        self.model = "gpt-3.5 turbo"
+        self.model = "gpt-3.5-turbo"
         self.temperature = 0.7
         self.response_format = "text"
 
@@ -118,6 +118,6 @@ class DeploymentGenerator:
             # Include service mapping in the final output
             file_mappings["service_mapping.json"] = service_mapping
             return file_mappings
-
+        
         except Exception as e:
             return {"error.txt": f"An error occurred during file generation: {str(e)}"}
