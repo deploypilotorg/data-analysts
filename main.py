@@ -8,6 +8,8 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from deployment_generator import DeploymentGenerator
+
 
 # Feature-to-Provider Mapping
 FEATURE_PROVIDER_MAPPING = {
@@ -139,15 +141,17 @@ class DeploymentPredictor:
 # Example usage
 if __name__ == "__main__":
     predictor = DeploymentPredictor("dataset.csv")
+    generator = DeploymentGenerator()  # Initialize DeploymentGenerator
+
     sample_repo = "excalidraw/excalidraw"  # Replace with actual repository
     predicted_deployment, justification = predictor.predict_deployment(sample_repo, n_similar=5)
 
     print(f"\nPredicted deployment type for {sample_repo}: {predicted_deployment}")
     print(f"Justification: {justification}")
 
-    predicted_deployment, justification = predictor.predict_from_vector(
-        [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], n_similar=5
-    )
+    # Generate deployment files using ChatGPT
+    generated_files = generator.generate_files(predicted_deployment, sample_repo)
 
-    print(f"\nPredicted deployment type for custom vec: {predicted_deployment}")
-    print(f"Justification: {justification}")
+    print("\nGenerated Deployment Files:")
+    for file_name, file_content in generated_files.items():
+        print(f"\n{file_name}:\n{file_content}\n")
