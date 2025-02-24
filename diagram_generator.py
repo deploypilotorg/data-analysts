@@ -18,7 +18,7 @@ class DiagramGenerator:
         self.client = openai.OpenAI(api_key=api_key)
 
         # Default configuration
-        self.model = "gpt-3.5 turbo"
+        self.model = "gpt-3.5-turbo"
         self.temperature = 0.7
 
     def generate_architecture_diagram(self, repo_name: str, project_structure: str) -> str:
