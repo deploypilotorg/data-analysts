@@ -3,13 +3,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import StandardScaler
+from collections import Counter
 
 # Load the dataset
 df = pd.read_csv('dataset.csv')
 
 # Preprocess data
 # Convert Yes/No to 1/0 for features
-df = df.replace({'Yes': 1, 'No': 0}).infer_objects()
+df = df.replace({'Yes': 1, 'No': 0})
+df = df.infer_objects(copy=False)
 
 # Separate features and target
 X = df.drop(['repository', 'deployment'], axis=1)
@@ -31,56 +35,58 @@ y_pred = model.predict(X_test)
 # Get unique classes present in the test set
 unique_classes = sorted(list(set(y_test) | set(y_pred)))
 target_names = le.inverse_transform(unique_classes)
-
 print("Model Performance:")
+print(classification_report(y_test, y_pred, target_names=target_names, zero_division=0))
 print(classification_report(y_test, y_pred, target_names=target_names))
 
-# Function to predict deployment platform for new projects
-def predict_deployment(features_dict):
+# Convert boolean strings to integers (if needed)
+X = X.astype(int)
+
+# Initialize and fit the scaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Calculate cosine similarity matrix
+similarity_matrix = cosine_similarity(X_scaled)
+
+def predict_deployment(repository_name, n_similar=5):
     """
-    Predict deployment platform for a new project.
-    
+    Predict the deployment type based on similar repositories
+
     Args:
-        features_dict (dict): Dictionary containing feature values (0 or 1)
-        
+        repository_name (str): Name of the repository to predict deployment for
+        n_similar (int): Number of similar repositories to consider for prediction
+
     Returns:
-        str: Predicted deployment platform
+        str: Predicted deployment type
     """
-    # Convert dictionary to DataFrame
-    features = pd.DataFrame([features_dict])
-    
-    # Make prediction
-    prediction = model.predict(features)
-    
-    # Return predicted platform
-    return le.inverse_transform(prediction)[0]
+    # Find the index of the repository
+    idx = df[df['repository'] == repository_name].index[0]
+
+    # Get similarity scores for this repository
+    similarity_scores = list(enumerate(similarity_matrix[idx]))
+
+    # Sort repositories by similarity score
+    similarity_scores = sorted(similarity_scores, key=lambda x: x[1], reverse=True)
+
+    # Get top N most similar repositories (excluding itself)
+    similar_repos = similarity_scores[1:n_similar+1]
+
+    # Get the deployment types of the similar repositories
+    similar_deployments = [y.iloc[idx] for idx, _ in similar_repos]
+
+    # Predict the deployment type based on the most common deployment type among similar repositories
+    predicted_deployment = Counter(similar_deployments).most_common(1)[0][0]
+
+    return predicted_deployment
 
 # Example usage
-example_project = {
-    'already_deployed': 0,
-    'has_frontend': 1,
-    'has_cicd': 0,
-    'multiple_environments': 0,
-    'uses_containerization': 0,
-    'uses_iac': 0,
-    'high_availability': 0,
-    'authentication': 1,
-    'realtime_events': 0,
-    'storage': 0,
-    'caching': 0,
-    'ai_implementation': 0,
-    'database': 1,
-    'microservices': 0,
-    'monolith': 0,
-    'api_exposed': 0,
-    'message_queues': 0,
-    'background_jobs': 0,
-    'sensitive_data': 0,
-    'external_apis': 0
-}
+if __name__ == "__main__":
+    # Example: Predict deployment for a repository
+    sample_repo = "excalidraw/excalidraw"  # Replace with an actual repository name from your dataset
+    predicted_deployment = predict_deployment(sample_repo, n_similar=5)
 
-print("\nPrediction for example project:")
-print(predict_deployment(example_project))
+    print(f"\nPredicted deployment type for {sample_repo}: {predicted_deployment}")
 
 # Print feature importance
 feature_importance = pd.DataFrame({
