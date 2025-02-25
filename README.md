@@ -1,60 +1,97 @@
-## Description
+# Data Analysts Repository
 
-This tool uses cosine similarity and feature analysis to predict deployment types for repositories. It works by:
-1. Loading and preprocessing repository data
-2. Computing similarity scores between repositories
-3. Making predictions based on the most common deployment types among similar repositories
+## Overview
+This repository is designed for analyzing and predicting cloud deployment strategies based on a dataset of repositories and their configurations. It contains scripts for processing data, generating deployment recommendations, and creating architecture diagrams using OpenAI models.
 
-## Requirements
+## Repository Structure
 
-- Python 3.x
-- pandas
-- numpy
-- scikit-learn
+```
+.
+├── dataset.csv               # Dataset of repositories with deployment attributes
+├── deployment_generator.py   # Script for analyzing project services and generating deployment files
+├── diagram_generator.py      # Script for generating architecture diagrams using OpenAI
+├── deployment_predictor.py   # Machine learning model to predict deployment strategy
+├── requirements.txt          # List of required dependencies
+├── .gitignore                # Ignored files and directories
+└── README.md                 # Documentation for the repository
+```
 
-## Installation
+## Features
+- **Deployment Prediction:** Predicts cloud deployment strategies based on repository characteristics.
+- **Architecture Diagram Generation:** Creates architecture diagrams using OpenAI's models.
+- **Cloud Service Mapping:** Maps repository components to recommended cloud services.
+- **Machine Learning Model:** Uses similarity analysis to determine the best deployment platform.
 
-1. Clone the repository:
+## Getting Started
+
+### Prerequisites
+Ensure you have the following installed:
+- Python 3.8 or higher
+- Pip package manager
+
+### Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/deployment-predictor.git
-   cd deployment-predictor
+   git clone https://github.com/deploypilotorg/data-analysts.git
+   cd data-analysts
    ```
-2. Install the required dependencies:
+
+2. **Install required dependencies:**
    ```bash
-   pip install pandas numpy scikit-learn
+   pip install -r requirements.txt
    ```
+
+3. **Set up your OpenAI API Key:**
+   - Create a `.env` file in the root directory and add your API key:
+     ```
+     OPENAI_API_KEY=your_api_key_here
+     ```
 
 ## Usage
 
-### Basic Usage
-
-The predictor requires a CSV dataset with repository features. The dataset should contain:
-- A `repository` column with repository names
-- A `deployment` column with deployment types
-- Feature columns (binary 0/1 values)
-
-### Methods
-
-#### `predict_deployment(repository_name, n_similar=5)`
-Predicts deployment type for a given repository name by finding similar repositories in the dataset.
-
-**Parameters:**
-- `repository_name` (str): Name of the repository (e.g., "owner/repo")
-- `n_similar` (int): Number of similar repositories to consider (default: 5)
-
-#### `predict_from_vector(feature_vector, n_similar=5)`
-Predicts deployment type for a custom feature vector.
-
-**Parameters:**
-- `feature_vector` (list/array): Binary feature vector matching the training data features
-- `n_similar` (int): Number of similar repositories to consider (default: 5)
-
-## Dataset Format
-
-The required CSV file should have the following structure:
-
-```csv
-repository,deployment,feature1,feature2,...,featureN
-owner/repo1,type1,1,0,1,...,0
-owner/repo2,type2,0,1,0,...,1
+### Deployment Prediction
+Use `deployment_predictor.py` to predict the deployment strategy for a given repository:
+```bash
+python deployment_predictor.py
 ```
+
+### Generate Deployment Files
+Call `deployment_generator.py` to generate deployment configurations:
+```bash
+python deployment_generator.py
+```
+
+### Generate Architecture Diagrams
+Use `diagram_generator.py` to create architecture diagrams:
+```bash
+python diagram_generator.py
+```
+
+## Data
+
+### `dataset.csv`
+- **Contains:** A structured dataset of repositories and their deployment attributes.
+- **Columns:**
+  - `repository`: GitHub repository name.
+  - `deployment`: Deployment platform (AWS, Vercel, Firebase, etc.).
+  - `already_deployed`: Whether the project is already deployed.
+  - `uses_containerization`: Whether the project uses Docker or Kubernetes.
+  - `database`: Whether the project includes a database.
+  - **More features** related to cloud architecture and deployment.
+
+## Contributing
+We welcome contributions! Follow these steps:
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add new feature'`).
+4. Push to your branch (`git push origin feature/your-feature`).
+5. Open a pull request.
+
+## License
+This project is licensed under the MIT License.
+
+## Contact
+For inquiries or contributions, contact:
+- **Team Name:** DeployPilotOrg
+- **Email:** [Your Contact Email]
