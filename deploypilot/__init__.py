@@ -1,5 +1,6 @@
 from .deployment_generator import DeploymentGenerator
 from .diagram_generator import DiagramGenerator
-from .main import DeploymentPredictor
+from .chatbot import ChatBot
+from .github_client import GitHubClient 
 
-__all__ = ["DeploymentGenerator", "DiagramGenerator", "DeploymentPredictor"]
+__all__ = ["DeploymentGenerator", "DiagramGenerator", "ChatBot", "GitHubClient"]
