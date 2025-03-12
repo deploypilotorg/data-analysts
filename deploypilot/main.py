@@ -5,8 +5,8 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from deployment_generator import DeploymentGenerator
-from diagram_generator import DiagramGenerator
+from deploypilot.deployment_generator import DeploymentGenerator
+from deploypilot.diagram_generator import DiagramGenerator
 
 # Feature-to-Provider Mapping
 FEATURE_PROVIDER_MAPPING = {
