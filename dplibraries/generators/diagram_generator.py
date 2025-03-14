@@ -62,4 +62,4 @@ class DiagramGenerator:
             return response.choices[0].message.content.strip()
         
         except Exception as e:
-            return f"Error generating architecture diagram: {str(e)}"
+            return f"Error generating architecture diagram: {str(e)}" 

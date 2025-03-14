@@ -5,8 +5,8 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from deploypilot.deployment_generator import DeploymentGenerator
-from deploypilot.diagram_generator import DiagramGenerator
+from dplibraries.generators.deployment_generator import DeploymentGenerator
+from dplibraries.generators.diagram_generator import DiagramGenerator
 
 # Feature-to-Provider Mapping
 FEATURE_PROVIDER_MAPPING = {
@@ -83,24 +83,4 @@ class DeploymentPredictor:
         service_mapping = generator.analyze_project_services(repo_name, project_structure)
         architecture_diagram = diagram_generator.generate_architecture_diagram(repo_name, project_structure)
         
-        return service_mapping, architecture_diagram
-
-if __name__ == "__main__":
-    predictor = DeploymentPredictor("dataset.csv")
-    generator = DeploymentGenerator()
-    diagram_generator = DiagramGenerator()
-    
-    sample_repo = "excalidraw/excalidraw"
-    predicted_deployment, justification = predictor.predict_deployment(sample_repo, n_similar=5)
-    print(f"\nPredicted deployment type for {sample_repo}: {predicted_deployment}")
-    print(f"Justification: {justification}")
-    
-    project_structure = "server/api.py\n database/models.py\n authentication/login.py"
-    service_mapping, architecture_diagram = predictor.analyze_and_generate(sample_repo, project_structure)
-    print(f"\nRecommended Cloud Services for {sample_repo}:\n{service_mapping}")
-    print(f"\nGenerated Architecture Diagram:\n{architecture_diagram}")
-    
-    generated_files = generator.generate_files(predicted_deployment, sample_repo, project_structure)
-    print("\nGenerated Deployment Files:")
-    for file_name, file_content in generated_files.items():
-        print(f"\n{file_name}:\n{file_content}\n")
+        return service_mapping, architecture_diagram 

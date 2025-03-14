@@ -1,7 +1,7 @@
 import openai
 import os
 from dotenv import load_dotenv
-from diagram_generator import DiagramGenerator
+from dplibraries.generators.diagram_generator import DiagramGenerator
 
 class DeploymentGenerator:
     def __init__(self):
@@ -126,4 +126,4 @@ class DeploymentGenerator:
             return file_mappings
         
         except Exception as e:
-            return {"error.txt": f"An error occurred during file generation: {str(e)}"}
+            return {"error.txt": f"An error occurred during file generation: {str(e)}"} 
