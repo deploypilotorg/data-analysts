@@ -19,3 +19,20 @@ class GitHubClient:
             }
         except Exception as e:
             return {"error": f"Failed to fetch repo: {str(e)}"}
+    
+    def get_repo_structure(self, repo_name):  # ✅ NEW METHOD
+        """Fetch repository file structure."""
+        try:
+            repo = self.client.get_repo(repo_name)
+            contents = repo.get_contents("")
+            structure = []
+            
+            while contents:
+                file_content = contents.pop(0)
+                structure.append(file_content.path)
+                if file_content.type == "dir":
+                    contents.extend(repo.get_contents(file_content.path))
+            
+            return structure
+        except Exception as e:
+            return {"error": f"Failed to fetch repo structure: {str(e)}"}
