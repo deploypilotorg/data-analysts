@@ -1,4 +1,4 @@
-# Data Analysts Repository
+# DeployPilot - Data Analysts Repository
 
 ## Overview
 This repository is designed for analyzing and predicting cloud deployment strategies based on a dataset of repositories and their configurations. It contains scripts for processing data, generating deployment recommendations, and creating architecture diagrams using OpenAI models.
@@ -8,9 +8,18 @@ This repository is designed for analyzing and predicting cloud deployment strate
 ```
 .
 ├── dataset.csv               # Dataset of repositories with deployment attributes
-├── deployment_generator.py   # Script for analyzing project services and generating deployment files
-├── diagram_generator.py      # Script for generating architecture diagrams using OpenAI
-├── deployment_predictor.py   # Machine learning model to predict deployment strategy
+├── main.py                   # Main entry point for the application
+├── dplibraries/              # Core library package
+│   ├── generators/           # Deployment and diagram generators
+│   │   ├── deployment_generator.py  # Generates deployment configurations
+│   │   └── diagram_generator.py     # Generates architecture diagrams
+│   ├── models/               # Machine learning models
+│   │   └── deployment_predictor.py  # Predicts deployment platforms
+│   └── utils/                # Utility functions
+├── docs/                     # Documentation
+├── examples/                 # Example notebooks and scripts
+├── tests/                    # Test files
+├── setup.py                  # Package installation configuration
 ├── requirements.txt          # List of required dependencies
 ├── .gitignore                # Ignored files and directories
 └── README.md                 # Documentation for the repository
@@ -42,30 +51,61 @@ Ensure you have the following installed:
    pip install -r requirements.txt
    ```
 
-3. **Set up your OpenAI API Key:**
+3. **Install the package in development mode:**
+   ```bash
+   pip install -e .
+   ```
+
+4. **Set up your OpenAI API Key:**
    - Create a `.env` file in the root directory and add your API key:
      ```
      OPENAI_API_KEY=your_api_key_here
      ```
+   - Or set it as an environment variable:
+     ```bash
+     export OPENAI_API_KEY="your_api_key_here"
+     ```
 
 ## Usage
 
-### Deployment Prediction
-Use `deployment_predictor.py` to predict the deployment strategy for a given repository:
+### Running the Application
+Use the main script to run the full application:
 ```bash
-python deployment_predictor.py
+python main.py
 ```
 
-### Generate Deployment Files
-Call `deployment_generator.py` to generate deployment configurations:
-```bash
-python deployment_generator.py
+This will:
+1. Predict the deployment platform for a sample repository
+2. Generate cloud service recommendations
+3. Create an architecture diagram
+4. Generate deployment configuration files
+
+### Using Individual Components
+
+#### Deployment Prediction
+```python
+from dplibraries.models.deployment_predictor import DeploymentPredictor
+
+predictor = DeploymentPredictor("dataset.csv")
+deployment, justification = predictor.predict_deployment("your-repo/name")
+print(f"Predicted deployment: {deployment}")
+print(f"Justification: {justification}")
 ```
 
-### Generate Architecture Diagrams
-Use `diagram_generator.py` to create architecture diagrams:
-```bash
-python diagram_generator.py
+#### Generate Deployment Files
+```python
+from dplibraries.generators.deployment_generator import DeploymentGenerator
+
+generator = DeploymentGenerator()
+files = generator.generate_files("AWS", "your-repo/name", "project structure")
+```
+
+#### Generate Architecture Diagrams
+```python
+from dplibraries.generators.diagram_generator import DiagramGenerator
+
+diagram_generator = DiagramGenerator()
+diagram = diagram_generator.generate_architecture_diagram("your-repo/name", "project structure")
 ```
 
 ## Data
@@ -87,7 +127,6 @@ We welcome contributions! Follow these steps:
 3. Commit your changes (`git commit -m 'Add new feature'`).
 4. Push to your branch (`git push origin feature/your-feature`).
 5. Open a pull request.
-
 
 ## Contact
 For inquiries or contributions, contact:

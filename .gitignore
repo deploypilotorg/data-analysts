@@ -1,4 +1,5 @@
 .DS_Store
+dataset.csv # just to prevent the dataset from being uploaded to the repository
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
