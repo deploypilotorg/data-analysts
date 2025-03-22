@@ -24,6 +24,31 @@ class DeploymentGenerator:
         self.model = "gpt-3.5-turbo"
         self.temperature = 0.7
 
+    def recommend_deployment_target(self, repo_name: str, project_structure: str) -> str:
+        """Use OpenAI to recommend a suitable deployment platform based on the repo."""
+        prompt = f"""
+        Given the following project structure for a GitHub repository named '{repo_name}', suggest the most appropriate deployment platform 
+        from the following options: AWS, Firebase, Vercel, Google Cloud.
+
+        Just respond with the most suitable platform name.
+
+        Project Structure:
+        {project_structure}
+        """
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a deployment strategy expert."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            return "unknown"
+
     def _get_project_structure(self, full_repo_name: str) -> str:
         """Generate a tree-like textual structure of the GitHub repository."""
         repo = self.gh.get_repo(full_repo_name)
@@ -129,3 +154,30 @@ class DeploymentGenerator:
 
         except Exception as e:
             return {"error.txt": f"An error occurred: {str(e)}"}
+
+
+def generate_deployment_files(repo_url: str, target_platform: str = None) -> dict:
+    """
+    High-level wrapper for the LangChain agent to get deployment suggestions + files.
+    """
+    dg = DeploymentGenerator()
+
+    # Extract repo name (e.g., "user/repo") from URL
+    parts = repo_url.rstrip("/").split("/")[-2:]
+    repo_name = parts[-1]
+    full_repo_name = "/".join(parts)
+
+    # Get project structure
+    project_structure = dg._get_project_structure(full_repo_name)
+
+    # Recommend platform if not provided
+    if not target_platform:
+        target_platform = dg.recommend_deployment_target(repo_name, project_structure)
+
+    # Generate deployment files
+    files = dg.generate_files(target_platform, repo_name, repo_url, project_structure)
+
+    return {
+        "recommendation": target_platform,
+        "files": files
+    }
