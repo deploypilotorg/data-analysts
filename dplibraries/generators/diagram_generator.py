@@ -62,4 +62,12 @@ class DiagramGenerator:
             return response.choices[0].message.content.strip()
         
         except Exception as e:
-            return f"Error generating architecture diagram: {str(e)}" 
+            return f"Error generating architecture diagram: {str(e)}"
+
+
+def generate_architecture_diagram(repo_name: str, project_structure: str) -> str:
+    """
+    Wrapper function for LangChain agent to call diagram generation.
+    """
+    generator = DiagramGenerator()
+    return generator.generate_architecture_diagram(repo_name, project_structure)
