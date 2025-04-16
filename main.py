@@ -8,6 +8,9 @@ def is_unspecified_input(text: str) -> bool:
         "", "?", "idk", "i don't know", "whatever", "not sure",
         "you decide", "recommend one", "anything", "no idea", "you choose", "i'm not sure",
         "i don't care", "unsure", "don't know", "no preference", "just pick one",
+        "i don't mind", "choose for me", "help me decide", "pick one for me",
+        "let's go with anything", "i'm open to suggestions", "i don't have a preference",
+        "i'm flexible", "just suggest something", "i'm indifferent", "i have no clue",
     ]
     return text.strip().lower() in vague_inputs
 
